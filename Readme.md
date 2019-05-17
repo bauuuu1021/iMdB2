@@ -17,3 +17,9 @@ $ sh script/setup.sh
 ```
 $ sh script/buildNexecute.sh
 ```
+
+## Dataset
+* Data size (after decompression)
+    * Small : ~3.3MB
+    * Full  : ~1.2GB (please download by yourself)
+* reference : [MovieLens - recommended for education and development](https://grouplens.org/datasets/movielens/)
