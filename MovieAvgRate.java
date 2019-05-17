@@ -40,19 +40,21 @@ public class MovieAvgRate {
     }
 
     public static class WordCountReducer
-            extends Reducer<Text,IntWritable,Text,IntWritable> {
+            extends Reducer<Text,IntWritable,Text,FloatWritable> {
 
-        private IntWritable result = new IntWritable();
+        private FloatWritable result = new FloatWritable();
 
         @Override
         public void reduce(Text key, Iterable<IntWritable> values,
                            Context context
         ) throws IOException, InterruptedException {
             int reduceSum = 0;
+            int iter = 0;
             for (IntWritable val : values) {
                 reduceSum += val.get();
+                iter += 1;
             }
-            result.set(reduceSum);
+            result.set((float)reduceSum/(10*iter));
             context.write(key, result);
         }
     }
@@ -63,7 +65,7 @@ public class MovieAvgRate {
         job.setJarByClass(MovieAvgRate.class);
         job.setReducerClass(WordCountReducer.class);
         job.setMapperClass(WordCountMapper.class);
-        job.setCombinerClass(WordCountReducer.class);
+        //job.setCombinerClass(WordCountReducer.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
 
