@@ -15,9 +15,9 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 public class MovieAvgRate {
     public static class WordCountMapper
-            extends Mapper<Object, Text, Text, IntWritable>{
+            extends Mapper<Object, Text, Text, FloatWritable>{
                 
-        private IntWritable rate  = new IntWritable();
+        private FloatWritable rate  = new FloatWritable();
         private Text word = new Text();
 
         @Override
@@ -31,30 +31,28 @@ public class MovieAvgRate {
                 // multipy by 10 to avoid type mismatch 
                 // (expected integer but rating score might be float)
                 word.set(array[1]);
-                float tmp = (new FloatWritable(Float.parseFloat(array[2]))).get();
-                tmp = tmp * 10;
-                rate.set(Math.round(tmp));
+                rate.set(Float.parseFloat(array[2]));
                 context.write(word, rate);
             }
         }
     }
 
     public static class WordCountReducer
-            extends Reducer<Text,IntWritable,Text,FloatWritable> {
+            extends Reducer<Text,FloatWritable,Text,FloatWritable> {
 
         private FloatWritable result = new FloatWritable();
 
         @Override
-        public void reduce(Text key, Iterable<IntWritable> values,
+        public void reduce(Text key, Iterable<FloatWritable> values,
                            Context context
         ) throws IOException, InterruptedException {
-            int reduceSum = 0;
+            float reduceSum = 0;
             int iter = 0;
-            for (IntWritable val : values) {
+            for (FloatWritable val : values) {
                 reduceSum += val.get();
                 iter += 1;
             }
-            result.set((float)reduceSum/(10*iter));
+            result.set((float)reduceSum/(iter));
             context.write(key, result);
         }
     }
@@ -65,9 +63,9 @@ public class MovieAvgRate {
         job.setJarByClass(MovieAvgRate.class);
         job.setReducerClass(WordCountReducer.class);
         job.setMapperClass(WordCountMapper.class);
-        //job.setCombinerClass(WordCountReducer.class);
+        job.setCombinerClass(WordCountReducer.class);
         job.setOutputKeyClass(Text.class);
-        job.setOutputValueClass(IntWritable.class);
+        job.setOutputValueClass(FloatWritable.class);
 
         // first argument : input dir.
         FileInputFormat.addInputPath(job, new Path(args[0]));
