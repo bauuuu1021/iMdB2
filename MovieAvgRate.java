@@ -59,7 +59,7 @@ public class MovieAvgRate {
 
     public static void main(String[] args) throws Exception {
         Configuration config = new Configuration();
-        Job job = Job.getInstance(config, "hadoop word count example");
+        Job job = Job.getInstance(config, "Average rating of movies");
         job.setJarByClass(MovieAvgRate.class);
         job.setReducerClass(WordCountReducer.class);
         job.setMapperClass(WordCountMapper.class);
