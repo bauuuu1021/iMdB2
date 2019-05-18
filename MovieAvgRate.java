@@ -15,10 +15,10 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 public class MovieAvgRate {
     public static class WordCountMapper
-            extends Mapper<Object, Text, Text, FloatWritable>{
+            extends Mapper<Object, Text, IntWritable, FloatWritable>{
                 
+        private IntWritable movie_id = new IntWritable();
         private FloatWritable rate  = new FloatWritable();
-        private Text word = new Text();
 
         @Override
         public void map(Object key, Text value, Context context
@@ -28,22 +28,20 @@ public class MovieAvgRate {
 				String[] array = st.nextToken().split(",");
 				System.out.println(array[1]+" "+array[2]);
 
-                // multipy by 10 to avoid type mismatch 
-                // (expected integer but rating score might be float)
-                word.set(array[1]);
+                movie_id.set(Integer.parseInt(array[1]));
                 rate.set(Float.parseFloat(array[2]));
-                context.write(word, rate);
+                context.write(movie_id, rate);
             }
         }
     }
 
     public static class WordCountReducer
-            extends Reducer<Text,FloatWritable,Text,FloatWritable> {
+            extends Reducer<IntWritable,FloatWritable,IntWritable,FloatWritable> {
 
         private FloatWritable result = new FloatWritable();
 
         @Override
-        public void reduce(Text key, Iterable<FloatWritable> values,
+        public void reduce(IntWritable key, Iterable<FloatWritable> values,
                            Context context
         ) throws IOException, InterruptedException {
             float reduceSum = 0;
@@ -64,7 +62,7 @@ public class MovieAvgRate {
         job.setReducerClass(WordCountReducer.class);
         job.setMapperClass(WordCountMapper.class);
         job.setCombinerClass(WordCountReducer.class);
-        job.setOutputKeyClass(Text.class);
+        job.setOutputKeyClass(IntWritable.class);
         job.setOutputValueClass(FloatWritable.class);
 
         // first argument : input dir.
