@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # hadoop startup
-hadoop namenode -format
-start-all.sh
+hdfs namenode -format
+start-dfs.sh
+start-yarn.sh
 
 # upload data to hadoop
 INPUT_PATH="/tmp/movie"
