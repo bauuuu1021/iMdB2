@@ -26,8 +26,6 @@ public class MovieAvgRate {
             StringTokenizer st = new StringTokenizer(value.toString(), "\n");
             while (st.hasMoreTokens()) {
 				String[] array = st.nextToken().split(",");
-				System.out.println(array[1]+" "+array[2]);
-
                 movie_id.set(Integer.parseInt(array[1]));
                 rate.set(Float.parseFloat(array[2]));
                 context.write(movie_id, rate);
